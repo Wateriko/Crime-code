@@ -1,0 +1,173 @@
+---
+title: "R Notebook VPD crime"
+output: html_notebook
+---
+
+
+
+```{r}
+crime <- read.csv("crime-in-vancouver/crime.csv")
+
+```
+
+```{r}
+summary(crime)
+```
+```{r}
+length(unique(crime$HUNDRED_BLOCK))
+length(unique(crime$NEIGHBOURHOOD))
+```
+#tidy time replace hour and min with Mean
+```{r}
+crime$HOUR
+crime$HOUR [is.na(crime$HOUR)]<-15.00
+crime$MINUTE[is.na(crime$MINUTE)]<-17.00
+head(crime)
+crime$MINUTE
+```
+# use Neighbourhood
+# top 10 blocks high crime type
+# crime per hood
+
+
+#year vs Crime count histgram
+```{r}
+#year vs Crime count histgram
+ggplot(crime, aes(x = YEAR))+
+  geom_histogram(binwidth = 0.5)
+
+#month vs Crime count histgram
+ggplot(crime, aes(x = MONTH))+
+  geom_histogram(binwidth = 0.5)
+```
+
+
+#NEIGHBOURHOOD vs Crime
+```{R}
+ggplot(crime, aes(x = NEIGHBOURHOOD))+
+  geom_bar()+
+  theme(axis.text.x=element_text(size=7, 
+                                     angle = 90,
+                                     ))
+```
+
+
+
+```{r}
+summary(crime$NEIGHBOURHOOD)
+head (crime$NEIGHBOURHOOD)
+```
+
+```{r}
+
+```
+
+```{R}
+crime$NEIGHBOURHOOD[crime$NEIGHBOURHOOD== ""] <- NA
+ggplot(crime, aes(x = NEIGHBOURHOOD),na.rm = TRUE)+
+  geom_bar()+
+  theme(axis.text.x=element_text(size=8, 
+                                     angle = 90
+                                    ))
+
+```
+
+```{r}
+summary(crime$NEIGHBOURHOOD)
+```
+
+
+#Neighbourhood vs crime count by type of crime 
+```{R}
+ggplot(crime, aes(x = NEIGHBOURHOOD, fill = factor(TYPE)))+
+  geom_bar(position  = "fill")+
+  theme(axis.text.x=element_text(size=8, 
+                                     angle = 90
+                                    ))
+#new.crime1 excludes break and enter/Vehicle collision
+ggplot(new.crime1, aes(x = NEIGHBOURHOOD, fill = factor(TYPE)))+ 
+  geom_bar(position  = "fill")+
+  theme(axis.text.x=element_text(size=8, 
+                                     angle = 90
+                                    ))
+```
+
+```{r}
+length(unique(crime$TYPE))
+summary(crime$TYPE)
+```
+
+# Creat data without Vehicle Collision, Break and Enter
+
+```{r}
+head(crime$TYPE)
+```
+
+
+```{r}
+
+new.crime <- crime[!grepl('Pedestrian', crime$TYPE),] #without pedestrian
+new.crime1 <- new.crime [!grepl('Break', new.crime$TYPE),] # without Break and enter
+
+```
+
+```{r}
+summary(new.crime1)
+```
+
+# color for heat map
+#data set for year, type, sum
+
+heat <- new.crime1 (TYPE,YEAR,)
+
+library("RColorBrewer")
+myColors <- brewer.pal(9, "Blues")
+
+ggplot(new.crime1, aes(x= YEAR, y= TYPE,  ))+
+  geom_tile()+
+  facet_wrap( ~ NEIGHBOURHOOD , ncol = 1)
+  
+```{r}
+vehicle.df <- new.crime1 [new.crime1 == "Theft of Vehicle",]
+head(vehicle.df)
+```
+
+```{r}
+which (is.na(vehicle.df$NEIGHBOURHOOD))
+```
+
+```{r}
+vehicle.df[!grepl('NA', vehicle.df$NEIGHBOURHOOD),] #no NA
+str(vehicle.df)
+summary(vehicle.df)
+```
+
+```{r}
+vehicle1.df <- vehicle.df[!grepl('NA', vehicle.df$NEIGHBOURHOOD),] #no NA
+
+```
+
+```{r}
+vehicle.df$NEIGHBOURHOOD
+
+```
+
+
+
+
+```{r}
+which (is.na(vehicle.df$NEIGHBOURHOOD))
+```
+nona.vehicle <- vehicle.df[!grepl("NA", vehicle.df$NEIGHBOURHOOD),]
+
+
+
+```{r}
+ggplot(vehicle1.df, aes(x = NEIGHBOURHOOD))+
+  geom_bar()+
+  theme(axis.text.x=element_text(size=7, 
+                                     angle = 90,
+                                     ))
+```
+
+
