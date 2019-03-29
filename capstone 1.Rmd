@@ -140,6 +140,8 @@ which (is.na(vehicle.df$NEIGHBOURHOOD))
 vehicle.df[!grepl('NA', vehicle.df$NEIGHBOURHOOD),] #no NA
 str(vehicle.df)
 summary(vehicle.df)
+
+
 ```
 
 ```{r}
@@ -154,7 +156,6 @@ vehicle.df$NEIGHBOURHOOD
 
 
 
-
 ```{r}
 which (is.na(vehicle.df$NEIGHBOURHOOD))
 ```
@@ -163,11 +164,61 @@ nona.vehicle <- vehicle.df[!grepl("NA", vehicle.df$NEIGHBOURHOOD),]
 
 
 ```{r}
-ggplot(vehicle1.df, aes(x = NEIGHBOURHOOD))+
+ggplot(vehicle1.df %>% filter(!is.na(NEIGHBOURHOOD)), aes(x = NEIGHBOURHOOD))+
   geom_bar()+
   theme(axis.text.x=element_text(size=7, 
                                      angle = 90,
                                      ))
 ```
 
+```{r}
+library(ggplot2)
+library(dplyr)
+```
 
+```{r}
+library(RColorBrewer)
+myColors <- brewer.pal(9, "Reds")
+
+```
+
+```{r}
+ggplot(vehicle1.df %>% filter(!is.na(NEIGHBOURHOOD)), aes(x = YEAR, y = NEIGHBOURHOOD, fill = NEIGHBOURHOOD)) +
+  geom_tile() +
+  facet_wrap( ~ NEIGHBOURHOOD, ncol = 1)
+```
++
+  scale_fill_gradientn(colors = myColors)
+  
+```{r} 
+tally(vehicle1.df, sort = FALSE, name = "n")
+
+```
+  
+```{r}  
+vehicle1.df$NEIGHBOURHOOD[vehicle1.df$NEIGHBOURHOOD==""] <- NA
+car.crime <- vehicle1.df %>% group_by(NEIGHBOURHOOD,YEAR) %>% tally() %>% filter(n < 600)
+View(car.crime)
+```
+
+```{r}
+ggplot(data = car.crime, mapping = aes(x = YEAR,
+                                         y = NEIGHBOURHOOD,
+                                        fill = car.crime$n)) +
+  geom_tile() 
+
+  
+```  
+
+```{r}  
+sum(is.na(car.crime$NEIGHBOURHOOD))
+car.crime$NEIGHBOURHOOD[car.crime$NEIGHBOURHOOD==""] <- NA
+
+#what happened SP empty?
+```
+
+```{r}
+car.crime.time <- vehicle1.df %>% group_by(NEIGHBOURHOOD,HOUR) %>% tally() %>% filter()
+View(car.crime.time)
+summary(car.crime.time)
+```
